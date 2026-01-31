@@ -101,6 +101,7 @@ class BigBirdTokenizer(TokenizersBackend):
         cls_token = AddedToken(cls_token, lstrip=False, rstrip=False) if isinstance(cls_token, str) else cls_token
         sep_token = AddedToken(sep_token, lstrip=False, rstrip=False) if isinstance(sep_token, str) else sep_token
         mask_token = AddedToken(mask_token, lstrip=True, rstrip=False) if isinstance(mask_token, str) else mask_token
+        mask_token_obj = mask_token
 
         self.add_prefix_space = add_prefix_space
 
@@ -134,6 +135,11 @@ class BigBirdTokenizer(TokenizersBackend):
             add_prefix_space=add_prefix_space,
             **kwargs,
         )
+
+        if isinstance(mask_token_obj, AddedToken):
+            mask_id = self._tokenizer.token_to_id(str(mask_token_obj))
+            if mask_id is not None:
+                self._tokenizer.add_special_tokens([mask_token_obj])
 
         # Ensure cls_token and sep_token are in vocab
         cls_token_str = str(cls_token)
