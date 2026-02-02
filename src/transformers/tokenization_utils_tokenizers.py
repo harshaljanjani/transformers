@@ -26,13 +26,13 @@ from typing import Any
 
 import tokenizers.pre_tokenizers as pre_tokenizers_fast
 from huggingface_hub import is_offline_mode
+from tokenizers import AddedToken, processors
+from tokenizers import Encoding as EncodingFast
+from tokenizers import Tokenizer as TokenizerFast
 from tokenizers.decoders import Decoder as DecoderFast
 from tokenizers.models import BPE, Unigram
 from tokenizers.trainers import BpeTrainer, UnigramTrainer, WordLevelTrainer, WordPieceTrainer
 
-from tokenizers import AddedToken, processors
-from tokenizers import Encoding as EncodingFast
-from tokenizers import Tokenizer as TokenizerFast
 from transformers.utils.hub import cached_file
 
 from .integrations.ggml import convert_gguf_tokenizer

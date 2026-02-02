@@ -13,9 +13,8 @@
 # limitations under the License.
 """Tokenization classes for Big Bird model."""
 
-from tokenizers.models import Unigram
-
 from tokenizers import Regex, Tokenizer, decoders, normalizers, pre_tokenizers, processors
+from tokenizers.models import Unigram
 
 from ...tokenization_python import AddedToken
 from ...tokenization_utils_tokenizers import TokenizersBackend
