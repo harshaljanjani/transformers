@@ -26,13 +26,13 @@ from typing import Any
 
 import tokenizers.pre_tokenizers as pre_tokenizers_fast
 from huggingface_hub import is_offline_mode
-from tokenizers import AddedToken, processors
-from tokenizers import Encoding as EncodingFast
-from tokenizers import Tokenizer as TokenizerFast
 from tokenizers.decoders import Decoder as DecoderFast
 from tokenizers.models import BPE, Unigram
 from tokenizers.trainers import BpeTrainer, UnigramTrainer, WordLevelTrainer, WordPieceTrainer
 
+from tokenizers import AddedToken, processors
+from tokenizers import Encoding as EncodingFast
+from tokenizers import Tokenizer as TokenizerFast
 from transformers.utils.hub import cached_file
 
 from .integrations.ggml import convert_gguf_tokenizer
@@ -364,6 +364,12 @@ class TokenizersBackend(PreTrainedTokenizerBase):
             if tokens:
                 # These tokens are from the special tokens map
                 self.add_tokens(tokens)
+
+        for special_token_value in self._special_tokens_map.values():
+            if special_token_value is not None and isinstance(special_token_value, AddedToken):
+                if not special_token_value.special:
+                    special_token_value.special = True
+                self._tokenizer.add_tokens([special_token_value])
 
         try:
             vocab_size = self._tokenizer.get_vocab_size()
