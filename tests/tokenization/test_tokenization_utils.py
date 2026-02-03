@@ -352,3 +352,29 @@ class TokenizerUtilsTest(unittest.TestCase):
             new_tokenizer.decode(new_tokenizer.encode(text_with_nonspecial_tokens), skip_special_tokens=True)
             == text_with_nonspecial_tokens
         )
+
+    @require_sentencepiece
+    @require_tokenizers
+    @slow
+    def test_mask_token_lstrip_preserved(self):
+        from transformers import BigBirdTokenizer
+
+        tokenizer = BigBirdTokenizer.from_pretrained("google/bigbird-roberta-base")
+
+        # Check that mask_token in _special_tokens_map has lstrip=True
+        mask_in_special = tokenizer._special_tokens_map.get("mask_token")
+        self.assertIsNotNone(mask_in_special)
+        self.assertTrue(mask_in_special.lstrip, "mask_token in _special_tokens_map should have lstrip=True")
+        mask_id = tokenizer.convert_tokens_to_ids("[MASK]")
+
+        # Check that the backend also has lstrip=True
+        backend_mask = tokenizer._tokenizer.get_added_tokens_decoder()[mask_id]
+        self.assertTrue(
+            backend_mask.lstrip, "Backend [MASK] should have lstrip=True, but got lstrip=False (bug not fixed)"
+        )
+        tokens = tokenizer.tokenize("Hello [MASK] world")
+        self.assertNotIn(
+            "▁",
+            [t for t in tokens if t != "▁Hello" and t != "▁world"],
+            "There should be no standalone '▁' token before [MASK]",
+        )

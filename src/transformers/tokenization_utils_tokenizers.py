@@ -346,7 +346,7 @@ class TokenizersBackend(PreTrainedTokenizerBase):
 
         # Also check extra special tokens
         for token in self._extra_special_tokens:
-            if str(token) not in encoder and token not in tokens_to_add:
+            if str(token) not in encoder and str(token) not in {str(t) for t in tokens_to_add}:
                 tokens_to_add.append(token)
 
         if len(tokens_to_add) > 0:
@@ -364,12 +364,6 @@ class TokenizersBackend(PreTrainedTokenizerBase):
             if tokens:
                 # These tokens are from the special tokens map
                 self.add_tokens(tokens)
-
-        for special_token_value in self._special_tokens_map.values():
-            if special_token_value is not None and isinstance(special_token_value, AddedToken):
-                if not special_token_value.special:
-                    special_token_value.special = True
-                self._tokenizer.add_tokens([special_token_value])
 
         try:
             vocab_size = self._tokenizer.get_vocab_size()
